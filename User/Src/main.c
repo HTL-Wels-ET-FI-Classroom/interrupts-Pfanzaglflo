@@ -72,6 +72,25 @@ int main(void)
 	LCD_SetColors(LCD_COLOR_MAGENTA, LCD_COLOR_BLACK); // TextColor, BackColor
 	LCD_DisplayStringAtLineMode(39, "copyright xyz", CENTER_MODE);
 
+
+	GPIO_InitTypeDef Switch_PA0;
+
+	Switch_PA0.Alternate = 0;
+	Switch_PA0.Mode = GPIO_MODE_IT_RISING;
+	Switch_PA0.Pin = GPIO_PIN_0;
+	Switch_PA0.Pull = GPIO_NOPULL;
+	Switch_PA0.Speed = GPIO_SPEED_FAST;
+
+	HAL_GPIO_Init(GPIOA, &Switch_PA0);
+
+	HAL_NVIC_EnableIRQ(EXTI0_IRQn);
+
+	void EXTI0_IRQHandler(void);
+	__HAL_GPIO_EXTI_CLEAR_IT(GPIO_PIN_0);
+
+
+
+
 	int cnt = 0;
 	/* Infinite loop */
 	while (1)
@@ -84,6 +103,14 @@ int main(void)
 		LCD_SetFont(&Font20);
 		LCD_SetTextColor(LCD_COLOR_BLUE);
 		LCD_SetPrintPosition(5, 0);
+		printf("   Timer: %.1f", cnt/10.0);
+
+		// display timer 2
+
+		cnt++;
+		LCD_SetFont(&Font20);
+		LCD_SetTextColor(LCD_COLOR_BLUE);
+		LCD_SetPrintPosition(7, 0);
 		printf("   Timer: %.1f", cnt/10.0);
 
 		// test touch interface
