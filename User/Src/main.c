@@ -22,8 +22,11 @@
 /* Private typedef -----------------------------------------------------------*/
 
 /* Private define ------------------------------------------------------------*/
-
+#define Max 4
 /* Private variables ---------------------------------------------------------*/
+int switchTimer = 0;
+int switchColour = 0;
+
 
 /* Private function prototypes -----------------------------------------------*/
 static int GetUserButtonPressed(void);
@@ -36,6 +39,25 @@ void SysTick_Handler(void)
 {
 	HAL_IncTick();
 }
+
+void EXTI0_IRQHandler(void) {
+	__HAL_GPIO_EXTI_CLEAR_IT(GPIO_PIN_0);
+	switchTimer=!switchTimer;
+
+
+
+
+}
+void EXTI3_IRQHandler(void) {
+
+	switchColour++;
+	if(switchColour==Max){
+		switchColour=0;
+	}
+
+
+}
+
 
 /**
  * @brief  The application entry point.
@@ -85,13 +107,26 @@ int main(void)
 
 	HAL_NVIC_EnableIRQ(EXTI0_IRQn);
 
-	void EXTI0_IRQHandler(void);
-	__HAL_GPIO_EXTI_CLEAR_IT(GPIO_PIN_0);
+	GPIO_InitTypeDef Switch_PG3;
+
+	Switch_PG3.Alternate = 0;
+	Switch_PG3.Mode = GPIO_MODE_IT_RISING;
+	Switch_PG3.Pin = GPIO_PIN_3;
+	Switch_PG3.Pull = GPIO_NOPULL;
+	Switch_PG3.Speed = GPIO_SPEED_FAST;
+
+	HAL_GPIO_Init(GPIOG, &Switch_PG3);
+
+	HAL_NVIC_EnableIRQ(EXTI3_IRQn);
 
 
 
 
-	int cnt = 0;
+
+
+	int cnt[2]={0,0};
+
+	int Colour[Max]={LCD_COLOR_BLUE, LCD_COLOR_RED, LCD_COLOR_GREEN, LCD_COLOR_YELLOW};
 	/* Infinite loop */
 	while (1)
 	{
@@ -99,19 +134,23 @@ int main(void)
 		HAL_Delay(100);
 
 		// display timer
-		cnt++;
+		cnt[switchTimer]++;
+
 		LCD_SetFont(&Font20);
-		LCD_SetTextColor(LCD_COLOR_BLUE);
+		LCD_SetTextColor(Colour[switchColour]);
 		LCD_SetPrintPosition(5, 0);
-		printf("   Timer: %.1f", cnt/10.0);
+		printf("   Timer: %.1f", cnt[0]/10.0);
 
 		// display timer 2
 
-		cnt++;
+
 		LCD_SetFont(&Font20);
-		LCD_SetTextColor(LCD_COLOR_BLUE);
+		LCD_SetTextColor(Colour[switchColour]);
 		LCD_SetPrintPosition(7, 0);
-		printf("   Timer: %.1f", cnt/10.0);
+		printf("   Timer: %.1f", cnt[1]/10.0);
+
+
+
 
 		// test touch interface
 		int x, y;
