@@ -27,6 +27,10 @@
 int switchTimer = 0;
 int switchColour = 0;
 
+int cnt[2]={0,0};
+
+
+
 
 /* Private function prototypes -----------------------------------------------*/
 static int GetUserButtonPressed(void);
@@ -38,6 +42,7 @@ static int GetTouchState (int *xCoord, int *yCoord);
 void SysTick_Handler(void)
 {
 	HAL_IncTick();
+	cnt[switchTimer]++;
 }
 
 void EXTI0_IRQHandler(void) {
@@ -124,22 +129,26 @@ int main(void)
 
 
 
-	int cnt[2]={0,0};
+
+
+
 
 	int Colour[Max]={LCD_COLOR_BLUE, LCD_COLOR_RED, LCD_COLOR_GREEN, LCD_COLOR_YELLOW};
 	/* Infinite loop */
 	while (1)
 	{
-		//execute main loop every 100ms
-		HAL_Delay(100);
+
+
+
+
 
 		// display timer
-		cnt[switchTimer]++;
+
 
 		LCD_SetFont(&Font20);
 		LCD_SetTextColor(Colour[switchColour]);
 		LCD_SetPrintPosition(5, 0);
-		printf("   Timer: %.1f", cnt[0]/10.0);
+		printf("   Timer: %.2f", cnt[0]/1000.0);
 
 		// display timer 2
 
@@ -147,7 +156,7 @@ int main(void)
 		LCD_SetFont(&Font20);
 		LCD_SetTextColor(Colour[switchColour]);
 		LCD_SetPrintPosition(7, 0);
-		printf("   Timer: %.1f", cnt[1]/10.0);
+		printf("   Timer: %.2f", cnt[1]/1000.0);
 
 
 
